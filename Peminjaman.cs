@@ -37,7 +37,8 @@ namespace Aplikasi_Perpustakaan
         {
             DataTable dt = new DataTable();
             string sql = "SELECT Nama FROM [dbo].[User]";
-            Page.READ(sql, dt);
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+            Page.READ(cmd, dt);
 
             txt_pustakawan.DataSource = dt;
             txt_pustakawan.ValueMember = "Nama";
@@ -48,7 +49,8 @@ namespace Aplikasi_Perpustakaan
         {
             DataTable dt = new DataTable();
             string sql = "SELECT Nama FROM [dbo].[Buku]";
-            Page.READ(sql, dt);
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+            Page.READ(cmd, dt);
 
             txt_buku.DataSource = dt;
             txt_buku.ValueMember = "Nama";
@@ -74,11 +76,16 @@ namespace Aplikasi_Perpustakaan
             if (!string.IsNullOrEmpty(buku) && !string.IsNullOrEmpty(kelas) && !string.IsNullOrEmpty(pustakawan) && !string.IsNullOrEmpty(siswa))
             {
                 string sql = "INSERT INTO [dbo].[Peminjaman] (Nama, Kelas, Buku, Pengawas) VALUES ('" + siswa + "','" + kelas + "','" + buku + "','" + pustakawan + "')";
-                
+                SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+
+                cmd.Parameters.AddWithValue("@siswa", siswa);
+                cmd.Parameters.AddWithValue("@siswa", kelas);
+                cmd.Parameters.AddWithValue("@siswa", buku);
+                cmd.Parameters.AddWithValue("@siswa", pustakawan);
 
                 try
                 {
-                    Page.EXECUTE(sql);
+                    Page.EXECUTE(cmd);
                     MessageBox.Show("Peminjaman Buku Berhasil Ditambahkan");
                 }
                 catch (Exception ex)

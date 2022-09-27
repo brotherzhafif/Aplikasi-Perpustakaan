@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -47,10 +49,14 @@ namespace Aplikasi_Perpustakaan
 
             if (!string.IsNullOrEmpty(jenis) || !string.IsNullOrEmpty(nama))
             {
-                string sql = "INSERT INTO [dbo].[buku] (Nama, Jenis) VALUES ('"+ nama +"', '"+ jenis +"')";
+                string sql = "INSERT INTO [dbo].[buku] (Nama, Jenis) VALUES (@nama, @jenis)";
+                SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                cmd.Parameters.AddWithValue("@nama", nama);
+                cmd.Parameters.AddWithValue("@nama", jenis);
+
                 try
                 {   
-                    Page.EXECUTE(sql);
+                    Page.EXECUTE(cmd);
                     MessageBox.Show("Buku Berhasil Tersimpan");
                 }
                 catch(Exception)

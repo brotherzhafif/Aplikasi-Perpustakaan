@@ -82,19 +82,15 @@ namespace Aplikasi_Perpustakaan
             return Validated;
         }
 
-        public static void EXECUTE(string sql)
+        public static void EXECUTE(SqlCommand cmd)
         {
-            Navigasi navigasi = new Navigasi();
-            SqlCommand cmd = new SqlCommand(sql, navigasi.cnn);
-            navigasi.cnn.Open();
+            Navigasi.cnn.Open();
             cmd.ExecuteReader();
-            navigasi.cnn.Close();
+            Navigasi.cnn.Close();
         }
 
-        public static DataTable READ(string sql, DataTable dt)
+        public static DataTable READ(SqlCommand cmd, DataTable dt)
         {
-            Navigasi navigasi = new Navigasi();
-            SqlCommand cmd = new SqlCommand(sql, navigasi.cnn);
             SqlDataAdapter da = new SqlDataAdapter(cmd);
 
             da.Fill(dt);

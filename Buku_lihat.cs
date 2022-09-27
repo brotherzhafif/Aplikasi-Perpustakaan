@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -45,9 +46,10 @@ namespace Aplikasi_Perpustakaan
         {
             Viewer.DataSource = null;
             string sql = "SELECT * FROM [dbo].[Buku]";
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
             DataTable dt = new DataTable();
 
-            Page.READ(sql, dt);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
         }
 
@@ -57,10 +59,12 @@ namespace Aplikasi_Perpustakaan
 
             string sql = "";
             string search = txt_search.Text.ToString();
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
 
             if (search != "" || !string.IsNullOrEmpty(search))
             {
-                sql = "SELECT * FROM [dbo].[Buku] WHERE Nama='" + search + "'OR Jenis='"+search+"'";
+                sql = "SELECT * FROM [dbo].[Buku] WHERE Nama=@search OR Jenis=@search";
+                cmd.Parameters.AddWithValue("@search", search);
             }
             else
             {
@@ -68,7 +72,7 @@ namespace Aplikasi_Perpustakaan
             }
 
             DataTable dt = new DataTable();
-            Page.READ(sql, dt);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
         }
 
@@ -80,8 +84,11 @@ namespace Aplikasi_Perpustakaan
             {
                 if (MessageBox.Show("Yakin ingin melakuan " + rows,  rows, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.Cancel)
                 {
-                    string sql = "DELETE FROM [dbo].[buku] WHERE ID='" + Viewer.Rows[e.RowIndex].Cells[2].Value.ToString() + "'";
-                    Page.EXECUTE(sql);
+                    string sql = "DELETE FROM [dbo].[buku] WHERE ID=@ID";
+                    SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                    cmd.Parameters.AddWithValue("@ID", Viewer.Rows[e.RowIndex].Cells[2].Value.ToString());
+
+                    Page.EXECUTE(cmd);
                     Fill();
                     MessageBox.Show(rows + " Berhasil");
                 }
@@ -94,8 +101,12 @@ namespace Aplikasi_Perpustakaan
             {
                 if (MessageBox.Show("Yakin ingin melakuan " + rows, rows, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.Cancel)
                 {
-                    string sql = "UPDATE [dbo].[buku] WHERE ID='" + Viewer.Rows[e.RowIndex].Cells[2].Value.ToString() + "' SET Nama='"+ Viewer.Rows[e.RowIndex].Cells[3].Value.ToString() +"', Jenis='" + Viewer.Rows[e.RowIndex].Cells[4].Value.ToString() + "'";
-                    Page.EXECUTE(sql);
+                    string sql = "UPDATE [dbo].[buku] WHERE ID=@ID SET Nama=@Nama, Jenis=@Jenis";
+                    SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                    cmd.Parameters.AddWithValue("@ID", Viewer.Rows[e.RowIndex].Cells[2].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Nama", Viewer.Rows[e.RowIndex].Cells[3].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Jenis", Viewer.Rows[e.RowIndex].Cells[4].Value.ToString());
+                    Page.EXECUTE(cmd);
                     Fill();
                     MessageBox.Show(rows + " Berhasil");
                 }

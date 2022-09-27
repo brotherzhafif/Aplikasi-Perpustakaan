@@ -35,9 +35,10 @@ namespace Aplikasi_Perpustakaan
         void Fill()
         {
             string sql = "SELECT * FROM [dbo].[Peminjaman]";
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
             DataTable dt = new DataTable();
 
-            Page.READ(sql, dt);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
         }
 
@@ -72,22 +73,23 @@ namespace Aplikasi_Perpustakaan
             }
 
             string sql;
+
             if (!string.IsNullOrEmpty(txt_search.Text.ToString()) || txt_search.Text != "")
             {
                 if (tanggal != "")
                 {
-                    sql = "SELECT * FROM [dbo].[Peminjaman] WHERE [Tanggal] = '" + tanggal + "' AND [Nama]='" + txt_search.Text + "' OR [Kelas]='" + txt_search.Text + "' OR [Buku]='" + txt_search.Text + "' OR [Pengawas]='" + txt_search.Text + "' OR [Status]='" + txt_search.Text + "'";
+                    sql = "SELECT * FROM [dbo].[Peminjaman] WHERE [Tanggal]=@tanggal AND [Nama]=@search OR [Kelas]=@search OR [Buku]=@search OR [Pengawas]=@search OR [Status]=@search";
                 }
                 else
                 {
-                    sql = "SELECT * FROM [dbo].[Peminjaman] WHERE [Nama]='" + txt_search.Text + "' OR [Kelas]='" + txt_search.Text + "' OR [Buku]='" + txt_search.Text + "' OR [Pengawas]='" + txt_search.Text + "' OR [Status]='" + txt_search.Text + "'";
+                    sql = "SELECT * FROM [dbo].[Peminjaman] WHERE [Nama]=@search OR [Kelas]=@search OR [Buku]=@search OR [Pengawas]=@search OR [Status]=@search";
                 }
             }
             else
             {
                 if (tanggal != "")
                 {
-                    sql = "SELECT * FROM [dbo].[Peminjaman] WHERE [Tanggal] = '" + tanggal + "'";
+                    sql = "SELECT * FROM [dbo].[Peminjaman] WHERE [Tanggal] =@tanggal";
                 }
                 else
                 {
@@ -95,9 +97,13 @@ namespace Aplikasi_Perpustakaan
                 }
             }
 
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+            cmd.Parameters.AddWithValue("@tanggal", tanggal);
+            cmd.Parameters.AddWithValue("@search", txt_search.Text);
+
             DataTable dt = new DataTable();
 
-            Page.READ(sql, dt);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
         }
 
@@ -109,8 +115,10 @@ namespace Aplikasi_Perpustakaan
             {
                 if (MessageBox.Show("Yakin ingin melakuan " + rows, rows, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.Cancel)
                 {
-                    string sql = "DELETE FROM [dbo].[Peminjaman] WHERE ID='" + Viewer.Rows[e.RowIndex].Cells[2].Value.ToString() + "'";
-                    Page.EXECUTE(sql);
+                    string sql = "DELETE FROM [dbo].[Peminjaman] WHERE ID=@ID";
+                    SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                    cmd.Parameters.AddWithValue("@ID", Viewer.Rows[e.RowIndex].Cells[2].Value.ToString());
+                    Page.EXECUTE(cmd);
                     Fill();
                     MessageBox.Show(rows + " Berhasil");
                 }
@@ -123,8 +131,16 @@ namespace Aplikasi_Perpustakaan
             {
                 if (MessageBox.Show("Yakin ingin melakuan " + rows, rows, MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.Cancel)
                 {
-                    string sql = "UPDATE [dbo].[Peminjaman] SET Nama='" + Viewer.Rows[e.RowIndex].Cells[3].Value.ToString() + "', Kelas='" + Viewer.Rows[e.RowIndex].Cells[4].Value.ToString() + "', Buku='" + Viewer.Rows[e.RowIndex].Cells[5].Value.ToString() + "', Pengawas='" + Viewer.Rows[e.RowIndex].Cells[6].Value.ToString() + "', Denda='" + Viewer.Rows[e.RowIndex].Cells[8].Value.ToString() + "', Status='" + Viewer.Rows[e.RowIndex].Cells[9].Value.ToString() + "'WHERE ID='" + Viewer.Rows[e.RowIndex].Cells[2].Value.ToString() + "'";
-                    Page.EXECUTE(sql);
+                    string sql = "UPDATE [dbo].[Peminjaman] SET Nama=@Nama, Kelas=@Kelas, Buku=@Buku, Pengawas=@Pengawas, Denda=@Denda, Status=@Status WHERE ID=@ID";
+                    SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                    cmd.Parameters.AddWithValue("@ID", Viewer.Rows[e.RowIndex].Cells[2].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Nama", Viewer.Rows[e.RowIndex].Cells[3].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Kelas", Viewer.Rows[e.RowIndex].Cells[4].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Buku", Viewer.Rows[e.RowIndex].Cells[5].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Pengawas", Viewer.Rows[e.RowIndex].Cells[6].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Denda", Viewer.Rows[e.RowIndex].Cells[8].Value.ToString());
+                    cmd.Parameters.AddWithValue("@Status", Viewer.Rows[e.RowIndex].Cells[9].Value.ToString());
+                    Page.EXECUTE(cmd);
                     Fill();
                     MessageBox.Show(rows + " Berhasil");
                 }

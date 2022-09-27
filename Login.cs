@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using EasyEncryption;
+using System.Data.Common;
 
 namespace Aplikasi_Perpustakaan
 {
@@ -32,11 +33,12 @@ namespace Aplikasi_Perpustakaan
                 nama = txt_nama.Text.ToString();
                 string pass = SHA.ComputeSHA256Hash(txt_pass.Text);
 
-                string sql = "SELECT * FROM [dbo].[User] WHERE Nama='" + nama +"'";
-
+                string sql = "SELECT * FROM [dbo].[User] WHERE Nama=@nama";
                 DataTable dt = new DataTable();
+                SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                cmd.Parameters.AddWithValue("@nama", nama);
 
-                Page.READ(sql, dt);
+                Page.READ(cmd, dt);
 
                 if (dt.Rows.Count > 0)
                 {

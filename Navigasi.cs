@@ -19,7 +19,7 @@ namespace Aplikasi_Perpustakaan
         public Peminjaman_graph Peminjaman_graph = new Peminjaman_graph();
         public Peminjaman_cetak Peminjaman_cetak = new Peminjaman_cetak();
 
-        public SqlConnection cnn = new SqlConnection("Data Source=BROTHERZHAFIF\\SQLEXPRESS;Initial Catalog=Perpustakaan_SMEKONE;Integrated Security=True");
+        public static SqlConnection cnn = new SqlConnection("Data Source=BROTHERZHAFIF\\SQLEXPRESS;Initial Catalog=Perpustakaan_SMEKONE;Integrated Security=True");
 
     }
 

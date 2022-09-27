@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Security;
 using System.Windows.Forms;
 namespace Aplikasi_Perpustakaan
@@ -39,8 +40,9 @@ namespace Aplikasi_Perpustakaan
             Viewer.DataSource = null;
             DataTable dt = new DataTable();
             string sql = "SELECT * FROM [dbo].[User]";
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
 
-            Page.READ(sql, dt);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
         }
 
@@ -53,7 +55,7 @@ namespace Aplikasi_Perpustakaan
             
             if (search != "" || !string.IsNullOrEmpty(search))
             {
-                sql = "SELECT * FROM [dbo].[User] WHERE Nama='" + search.ToString() + "'OR [Level]='"+ search +"'";
+                sql = "SELECT * FROM [dbo].[User] WHERE Nama=@search OR [Level]=@search";
             }
             else
             {
@@ -61,7 +63,9 @@ namespace Aplikasi_Perpustakaan
             }
                 
             DataTable dt = new DataTable();
-            Page.READ(sql, dt);
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+            cmd.Parameters.AddWithValue("@search", search);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
         }
 
@@ -78,27 +82,30 @@ namespace Aplikasi_Perpustakaan
             string pass = rows.Cells[5].Value.ToString();
             var level = rows.Cells[6].Value;
             bool success = false;
+            string hashedpass = Page.HashSha256(pass);
 
             if (nama != "" || !string.IsNullOrEmpty(nama) || pass != "" || !string.IsNullOrEmpty(pass) || nama != "" || !string.IsNullOrEmpty(nama))
             {
 
                 DataTable dt = new DataTable();
-                sql = "SELECT * FROM [dbo].[User] Where Nama='" + nama + "'";
-                Page.READ(sql, dt);
-                string hashedpass = Page.HashSha256(pass);
+                sql = "SELECT * FROM [dbo].[User] Where Nama=@Nama";
+                SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+
+                cmd.Parameters.AddWithValue("@Nama", nama);
+                Page.READ(cmd, dt);
 
                 if ((dt.Rows.Count > 0) != true)
                 {
                     if (rows.Cells[e.ColumnIndex].Value.ToString() == "Insert")
                     {
-                        sql = "INSERT INTO [dbo].[User] (Nama, Password, [Level]) Values ('" + nama + "','" + hashedpass + "','" + level + "')";
+                        sql = "INSERT INTO [dbo].[User] (Nama, Password, [Level]) Values (@nama,@Hashedpass,@level)";
                         success = true;
                     }
                     else if (rows.Cells[e.ColumnIndex].Value.ToString() == "Update")
                     {
                         if (rows.Cells[3].Value.ToString() == "Masukan Nama" || rows.Cells[4].Value.ToString() == "Masukan Password")
                         {
-                            sql = "UPDATE [dbo].[User] SET Nama='" + nama + "', Password='" + hashedpass + "',[Level]='" + level + "' WHERE ID='" + rows.Cells[3].Value + "'";
+                            sql = "UPDATE [dbo].[User] SET Nama=@Nama, Password=@Hashedpass,[Level]=@level WHERE ID=@ID";
                             success = true;
                         }
                     }
@@ -107,7 +114,7 @@ namespace Aplikasi_Perpustakaan
                 {
                     if(rows.Cells[e.ColumnIndex].Value.ToString() == "Delete")
                     {
-                        sql = "DELETE FROM [dbo].[user] WHERE ID='" + rows.Cells[3].Value + "'";
+                        sql = "DELETE FROM [dbo].[user] WHERE ID=@ID";
                         success = true;
                     }
                     else
@@ -124,7 +131,12 @@ namespace Aplikasi_Perpustakaan
             if (success != false)
             {
                 MessageBox.Show(rows.Cells[e.ColumnIndex].Value.ToString() + " Berhasil Dijalankan");
-                Page.EXECUTE(sql);
+                SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
+                cmd.Parameters.AddWithValue("@Nama", nama);
+                cmd.Parameters.AddWithValue("@level", level);
+                cmd.Parameters.AddWithValue("@ID", rows.Cells[3].Value);
+                cmd.Parameters.AddWithValue("@Hashedpass", hashedpass);
+                Page.EXECUTE(cmd);
                 FILL();
             }
         }

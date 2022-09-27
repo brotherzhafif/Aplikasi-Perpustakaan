@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Aplikasi_Perpustakaan
@@ -39,8 +40,9 @@ namespace Aplikasi_Perpustakaan
 
             string sql = "SELECT COUNT(*) AS Peminjaman, Tanggal from [dbo].[Peminjaman] Group BY Tanggal Having(COUNT(*)>=1)";
             DataTable dt = new DataTable();
+            SqlCommand cmd = new SqlCommand(sql, Navigasi.cnn);
 
-            Page.READ(sql, dt);
+            Page.READ(cmd, dt);
             Viewer.DataSource = dt;
 
             Viewer.Series["Peminjaman"].XValueMember = "Tanggal";
@@ -49,7 +51,7 @@ namespace Aplikasi_Perpustakaan
             Viewer.Titles.Add("Peminjaman Bulanan");
         }
 
-        void fitering()
+        /*void fitering()
         {
             Viewer.DataSource = null;
 
@@ -96,11 +98,11 @@ namespace Aplikasi_Perpustakaan
 
             Viewer.Series["Peminjaman"].XValueMember = "Tanggal";
             Viewer.Series["Peminjaman"].YValueMembers = "Peminjaman";
-        }
+        }*/
 
         private void btn_filter_Click(object sender, EventArgs e)
         {
-            fitering();
+            
         }
     }
 }
